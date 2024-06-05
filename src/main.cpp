@@ -1,8 +1,8 @@
-#include <Arduino.h>
-#include <Wire.h>
+#include <Adafruit_BMP280.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-#include <Adafruit_BMP280.h>
+#include <Arduino.h>
+#include <Wire.h>
 
 // Define e configura display
 #define OLED_RESET 4
@@ -15,30 +15,32 @@ Adafruit_SSD1306 display(OLED_RESET);
 #define BMP085_ADDRESS 0x76
 Adafruit_BMP280 bmp;
 
-void setup()
-{
+void initScreen();
+
+void setup() {
   // Inicializa I2C
   Wire.begin();
 
   // Inicializa display no endereço 0x3C do I2C
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
 
-  display.clearDisplay();
-  display.setTextColor(WHITE);
-  display.setTextSize(1);
+  initScreen();
 
-  display.setCursor(0, 10);
-  display.print("Iniciando novo...");
-  display.display();
-  delay(1000);
+  // display.clearDisplay();
+  // display.setTextColor(WHITE);
+  // display.setTextSize(1);
+
+  // display.setCursor(0, 10);
+  // display.print("Iniciando novo...");
+  // display.display();
+  // delay(1000);
 
   while (!Serial)
     delay(10); // wait for native usb
   unsigned status;
 
   status = bmp.begin(BMP085_ADDRESS);
-  if (!status)
-  {
+  if (!status) {
     // Apaga display
     display.clearDisplay();
     // Configurar tamanho da fonte
@@ -53,18 +55,19 @@ void setup()
 
   /* Default settings from datasheet. */
   bmp.setSampling(Adafruit_BMP280::MODE_NORMAL,     /* Operating Mode. */
-                  Adafruit_BMP280::SAMPLING_X2,     /* Temp. oversampling */
-                  Adafruit_BMP280::SAMPLING_X16,    /* Pressure oversampling */
-                  Adafruit_BMP280::FILTER_X16,      /* Filtering. */
-                  Adafruit_BMP280::STANDBY_MS_500); /* Standby time. */
+    Adafruit_BMP280::SAMPLING_X2,     /* Temp. oversampling */
+    Adafruit_BMP280::SAMPLING_X16,    /* Pressure oversampling
+                                       */
+    Adafruit_BMP280::FILTER_X16,      /* Filtering. */
+    Adafruit_BMP280::STANDBY_MS_500); /* Standby time. */
 }
 
-void loop()
-{
+void loop() {
   // Apaga display
   display.clearDisplay();
 
-  // Configura cor, utilizar White mesmo que display seja de outra cor
+  // Configura cor, utilizar White mesmo que display seja de
+  // outra cor
   display.setTextColor(WHITE);
 
   // Configurar tamanho da fonte
@@ -82,5 +85,28 @@ void loop()
   display.print(bmp.readPressure());
   display.setCursor(0, 30);
 
+  display.display();
+}
+
+void initScreen() {
+  display.setRotation(0);
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(2, 24);
+  display.clearDisplay();
+  display.print(F("Variometro"));
+
+  display.display();
+
+  delay(2000);
+
+  display.clearDisplay();
+  display.setCursor(2, 24);
+  display.print(F("  , )( `  "));
+  display.display();
+
+  delay(2000);
+
+  display.clearDisplay();
   display.display();
 }
